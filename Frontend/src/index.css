@@ -1,0 +1,155 @@
+@import "tailwindcss";
+
+/* Base styles */
+:root {
+  --color-primary: 37 99 235;
+  --color-background: 249 250 251;
+  --color-card: 255 255 255;
+  --color-text: 17 24 39;
+  --color-text-secondary: 107 114 128;
+  --color-input-border: 229 231 235;
+  --color-input-focus: 59 130 246;
+  --color-button: 37 99 235;
+  --color-button-hover: 29 78 216;
+  
+  /* Animation durations */
+  --transition-slow: 700ms;
+  --transition-medium: 300ms;
+  --transition-fast: 150ms;
+  
+  /* Pattern */
+  --background-pattern: radial-gradient(rgba(37, 99, 235, 0.1) 1px, transparent 1px);
+}
+
+/* Dark mode variables */
+.dark {
+  --color-primary: 96 165 250;
+  --color-background: 17 24 39;
+  --color-card: 31 41 55;
+  --color-text: 243 244 246;
+  --color-text-secondary: 156 163 175;
+  --color-input-border: 75 85 99;
+  --color-input-focus: 96 165 250;
+  --color-button: 59 130 246;
+  --color-button-hover: 96 165 250;
+  
+  /* Pattern */
+  --background-pattern: radial-gradient(rgba(96, 165, 250, 0.15) 1px, transparent 1px);
+}
+
+/* Apply theme colors to elements */
+body {
+  @apply bg-gray-100 dark:bg-gray-900;
+  color: rgb(var(--color-text));
+  transition: background-color var(--transition-medium), color var(--transition-medium);
+}
+
+/* Text utility classes */
+.text-themed {
+  color: rgb(var(--color-text));
+}
+
+.text-themed-secondary {
+  color: rgb(var(--color-text-secondary));
+}
+
+.text-themed-primary {
+  color: rgb(var(--color-primary));
+}
+
+/* Background utility classes */
+.bg-themed {
+  background-color: rgb(var(--color-background));
+}
+
+.bg-themed-card {
+  background-color: rgb(var(--color-card));
+}
+
+.bg-themed-primary {
+  background-color: rgb(var(--color-primary));
+}
+
+/* Dynamic patterns for backgrounds */
+.bg-pattern {
+  background-color: rgb(var(--color-background));
+  background-image: var(--background-pattern);
+  background-size: 20px 20px;
+}
+
+/* Card styles */
+.auth-card {
+  background-color: rgb(var(--color-card));
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  transition: background-color var(--transition-medium), box-shadow var(--transition-medium), transform var(--transition-fast);
+}
+
+.dark .auth-card {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+/* Button styles */
+.btn-primary {
+  background-color: rgb(var(--color-button));
+  color: white;
+  transition: background-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.btn-primary:hover {
+  background-color: rgb(var(--color-button-hover));
+  transform: translateY(-1px);
+}
+
+.btn-primary:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: rgba(var(--color-input-focus), 0.5);
+}
+
+/* Input field styles */
+.input-field {
+  border-color: rgb(var(--color-input-border));
+  background-color: rgb(var(--color-card));
+  color: rgb(var(--color-text));
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.input-field:focus {
+  border-color: rgb(var(--color-input-focus));
+  box-shadow: 0 0 0 3px rgba(var(--color-input-focus), 0.25);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* OTP input specific styles */
+.otp-input {
+  width: 3rem;
+  height: 3rem;
+  text-align: center;
+  font-size: 1.25rem;
+  font-weight: 600;
+  border-width: 2px;
+  border-radius: 0.375rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.otp-input:focus {
+  border-color: rgb(var(--color-input-focus));
+  box-shadow: 0 0 0 3px rgba(var(--color-input-focus), 0.25);
+}
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+    100% { transform: translateY(0px); }
+  }
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
