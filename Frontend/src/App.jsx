@@ -9,6 +9,8 @@ import { LogoutPage } from './components/user/Logout';
 import OTPLogin from './components/user/login/OTPLogin';
 import LoginNavigator from './components/user/login/LoginNavigator';
 import TaskDashboard from './components/user/dashboard/dashboard';
+import UserProfile from './components/user/UserProfile';
+import ProfilePage from './pages/ProfilePage';
 
 
 function App() {
@@ -24,7 +26,17 @@ function App() {
           } />
         <Route path="/login" element={<LoginNavigator />} />
         <Route path="/passwordlogin" element={<Login />} />
-        <Route path="/dashboard" element={<TaskDashboard/>} />
+        <Route path="/dashboard" element={
+          <ProtectedRoute>
+          <TaskDashboard/>
+          </ProtectedRoute>
+          } />
+
+<Route path="/profile" element={
+          <ProtectedRoute>
+          <ProfilePage/>
+          </ProtectedRoute>
+          } />  
 
 
         <Route path="/otplogin" element={<OTPLogin />} />

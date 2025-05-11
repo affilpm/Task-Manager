@@ -616,7 +616,7 @@ const TaskDashboard = () => {
                     <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} truncate`}>{email}</p>
                   </div>
                   <a 
-                    href="#profile" 
+                    onClick={() => navigate('/profile')}
                     className={`flex items-center px-4 py-2 text-sm ${textColor} hover:${isDark ? 'bg-gray-700' : 'bg-gray-100'} transition-colors`}
                     role="menuitem"
                   >

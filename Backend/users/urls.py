@@ -10,7 +10,9 @@ from .views import (
     ResendLoginOTPView,
     CustomTokenRefreshView,
     CustomTokenVerifyView,
-    LogoutView,
+    LogoutView, 
+    UserProfileAPIView, 
+    PasswordChangeAPIView
 )
 
 
@@ -29,6 +31,8 @@ urlpatterns = [
     path('token/verify/', CustomTokenVerifyView.as_view(), name='token-verify'),
     path('logout', LogoutView.as_view(), name='logout'),
     
-
+    #profile
+    path('profile/', UserProfileAPIView.as_view(), name='user-profile'),
+    path('change-password/', PasswordChangeAPIView.as_view(), name='change-password'),
 
 ]

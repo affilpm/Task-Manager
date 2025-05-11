@@ -7,7 +7,7 @@ import string
 from django.contrib.auth import get_user_model, authenticate
 from django.core.cache import cache
 from .utils import generate_otp, send_otp_email, store_otp_in_cache
-
+from django.contrib.auth.password_validation import validate_password
 
 
 User = get_user_model()
@@ -113,3 +113,44 @@ class ResendLoginOTPSerializer(serializers.Serializer):
         if not User.objects.filter(email=value).exists():
             raise serializers.ValidationError("No account found with this email address.")
         return value
+    
+    
+    
+    
+
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    """Serializer for user profile data"""
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'full_name']
+        read_only_fields = ['id', 'email']
+
+
+class PasswordChangeSerializer(serializers.Serializer):
+    """Serializer for password change endpoint"""
+    current_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True)
+    confirm_password = serializers.CharField(required=True)
+
+    def validate_current_password(self, value):
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise serializers.ValidationError("Current password is incorrect")
+        return value
+
+    def validate_new_password(self, value):
+        validate_password(value, self.context['request'].user)
+        return value
+
+    def validate(self, data):
+        if data['new_password'] != data['confirm_password']:
+            raise serializers.ValidationError({"confirm_password": "Password fields didn't match."})
+        return data
+
+    def save(self, **kwargs):
+        user = self.context['request'].user
+        user.set_password(self.validated_data['new_password'])
+        user.save()
+        return user    
