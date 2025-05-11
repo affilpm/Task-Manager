@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthService from '../../services/AuthenticationService';
 import axiosInstance from '../../api/api';
+import { persistor } from '../../store';
 
 const LogoutButton = ({ className, buttonText = 'Logout' }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -23,7 +24,7 @@ const LogoutButton = ({ className, buttonText = 'Logout' }) => {
       
       // Clear local storage regardless of server response
       AuthService.logout();
-      
+      await persistor.purge();
       // Redirect to login page
       window.location.href = '/login';
     } catch (error) {

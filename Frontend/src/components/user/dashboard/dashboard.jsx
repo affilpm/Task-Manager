@@ -20,7 +20,7 @@ import {
   setLoading,
   setError,
 } from '../../../slices/taskSlice';
-
+import { useNavigate } from 'react-router-dom';
 
 
 // Color Scheme Hook
@@ -430,6 +430,8 @@ const TaskDashboard = () => {
 
   const isDark = useColorScheme(theme);
 
+  const navigate = useNavigate()
+
   useEffect(() => {
     const fetchTasks = async () => {
       dispatch(setLoading());
@@ -630,14 +632,14 @@ const TaskDashboard = () => {
                     Settings
                   </a>
                   <div className={`border-t ${borderColor} my-1`}></div>
-                  <a 
-                    href="#logout" 
-                    className={`flex items-center px-4 py-2 text-sm ${isDark ? 'text-red-400 hover:bg-gray-700' : 'text-red-600 hover:bg-gray-100'} transition-colors`}
+                  <button 
+                    onClick={() => navigate('/logout')}
+                    className={`flex items-center w-full text-left px-4 py-2 text-sm ${isDark ? 'text-red-400 hover:bg-gray-700' : 'text-red-600 hover:bg-gray-100'} transition-colors`}
                     role="menuitem"
                   >
                     <LogOut size={16} className="mr-3" />
                     Sign out
-                  </a>
+                  </button>
                 </div>
               )}
             </div>
