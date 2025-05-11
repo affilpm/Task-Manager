@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import axiosInstance from '../../../api/api';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../../slices/userSlice';
 
 // Reusing the same DynamicBackground component from the password login
 const DynamicBackground = () => {
@@ -73,6 +75,8 @@ const OTPLogin = () => {
   
   const navigate = useNavigate();
   const otpInputs = useRef([]);
+
+  const dispatch = useDispatch()
 
   // Check system theme preference
   useEffect(() => {
@@ -291,6 +295,12 @@ const OTPLogin = () => {
       localStorage.setItem('access', response.data.access);
       localStorage.setItem('refresh', response.data.refresh);
       
+      dispatch(setUser({
+        fullName: response.data.user.full_name,
+        email: response.data.user.email,
+      }));
+
+
       // Show success message with animation
       const successMessage = document.createElement('div');
       successMessage.className = 'fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50';

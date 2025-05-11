@@ -48,12 +48,6 @@ class InitiateRegistrationView(APIView):
         if serializer.is_valid():
             email = serializer.validated_data['email']
             
-    #         # Check if user already exists
-    #         if User.objects.filter(email=email).exists():
-    #             return Response(
-    #                 {"detail": "An account with this email already exists. Please login or use a different email."},
-    #                 status=status.HTTP_400_BAD_REQUEST
-    # )
             # Generate and send OTP
             otp = generate_otp()
             store_otp_in_cache(email, otp)

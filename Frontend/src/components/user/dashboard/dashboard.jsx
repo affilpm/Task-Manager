@@ -21,6 +21,8 @@ import {
   setError,
 } from '../../../slices/taskSlice';
 
+
+
 // Color Scheme Hook
 const useColorScheme = (theme) => {
   const [isDark, setIsDark] = useState(false);
@@ -419,6 +421,8 @@ const TaskDashboard = () => {
   const { tasks, filter, sortBy, stats, status, error } = useSelector(
     state => state.tasks
   );
+  const fullName = useSelector((state) => state.user.fullName);
+  const email = useSelector((state) => state.user.email);
   const { theme } = useSelector(state => state.theme);
   const [showForm, setShowForm] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
@@ -596,7 +600,7 @@ const TaskDashboard = () => {
                 <div className={`w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full ${isDark ? 'bg-blue-600' : 'bg-blue-100'} mr-2 sm:mr-3`}>
                   <User size={16} className={isDark ? 'text-white' : 'text-blue-600'} />
                 </div>
-                <span className={`hidden sm:block font-medium text-sm ${textColor}`}>John Doe</span>
+                <span className={`hidden sm:block font-medium text-sm ${textColor}`}>{fullName}</span>
                 <ChevronDown size={16} className={`ml-1 sm:ml-2 ${textColor} transition-transform ${profileMenuOpen ? 'rotate-180' : ''}`} />
               </button>
               {profileMenuOpen && (
@@ -606,8 +610,8 @@ const TaskDashboard = () => {
                   aria-orientation="vertical"
                 >
                   <div className={`px-4 py-3 border-b ${borderColor}`}>
-                    <p className={`font-semibold ${textColor} text-base`}>John Doe</p>
-                    <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} truncate`}>john.doe@example.com</p>
+                    <p className={`font-semibold ${textColor} text-base`}>{fullName}</p>
+                    <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} truncate`}>{email}</p>
                   </div>
                   <a 
                     href="#profile" 
