@@ -1,6 +1,6 @@
 import React from 'react';
 // import VerifyOtp from './components/Registration/OtpVerification';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Register from './components/user/Registration/Register';
 import { LogIn } from 'lucide-react';
 import Login from './components/user/login/PasswordLogin';
