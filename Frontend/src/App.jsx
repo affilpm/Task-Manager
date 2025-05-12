@@ -24,7 +24,8 @@ function App() {
         <Route path="/register" element={
                     <Register />
           } />
-        <Route path="/login" element={<LoginNavigator />} />
+        <Route path="/" element={<LoginNavigator />} />
+        <Route path="/login" element={<Navigate to="/" />} />
         <Route path="/passwordlogin" element={<Login />} />
         <Route path="/dashboard" element={
           <ProtectedRoute>
