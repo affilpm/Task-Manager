@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 
-const baseURL = 'http://localhost:8000/api';
+const baseURL = 'https://task.affils.site/api';
 const axiosInstance = axios.create({
     baseURL,
     timeout: 5000,

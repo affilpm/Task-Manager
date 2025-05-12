@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8000/api/';
+const API_URL = 'https://task.affils.site/api/';
 
 /**
  * Initiates the registration process by sending user data to the server
