@@ -11,6 +11,7 @@ import LoginNavigator from './components/user/login/LoginNavigator';
 import TaskDashboard from './components/user/dashboard/dashboard';
 import UserProfile from './components/user/UserProfile';
 import ProfilePage from './pages/ProfilePage';
+import NotFound from './components/NotFound';
 
 
 function App() {
@@ -18,26 +19,28 @@ function App() {
     <Router>
       <Routes>
 
+      <Route path="*" element={<NotFound />} />
 
       <Route path="/logout" element={<LogoutPage />} />
 
         <Route path="/register" element={
                     <Register />
           } />
-        <Route path="/" element={<LoginNavigator />} />
-        <Route path="/login" element={<Navigate to="/" />} />
-        <Route path="/passwordlogin" element={<Login />} />
+        <Route path="/login" element={<LoginNavigator />} />
         <Route path="/dashboard" element={
-          <ProtectedRoute>
-          <TaskDashboard/>
-          </ProtectedRoute>
-          } />
+                    <ProtectedRoute>
+                    <TaskDashboard/>
+                    </ProtectedRoute>
+        } />
+        <Route path="/" element={ <Navigate to="/dashboard"/> }/>
 
-<Route path="/profile" element={
-          <ProtectedRoute>
-          <ProfilePage/>
-          </ProtectedRoute>
-          } />  
+        <Route path="/passwordlogin" element={<Login />} />
+
+        <Route path="/profile" element={
+                  <ProtectedRoute>
+                  <ProfilePage/>
+                  </ProtectedRoute>
+                  } />  
 
 
         <Route path="/otplogin" element={<OTPLogin />} />
