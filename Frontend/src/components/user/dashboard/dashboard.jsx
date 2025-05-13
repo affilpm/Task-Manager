@@ -21,7 +21,7 @@ import {
   setError,
 } from '../../../slices/taskSlice';
 import { useNavigate } from 'react-router-dom';
-
+import TaskCalendar from './TaskCalendar';
 
 // Color Scheme Hook
 const useColorScheme = (theme) => {
@@ -415,23 +415,40 @@ const EmptyState = ({ onAddClick, isDark }) => {
   );
 };
 
+
+
 // TaskDashboard Component
 const TaskDashboard = () => {
   const dispatch = useDispatch();
-  const { tasks, filter, sortBy, stats, status, error } = useSelector(
-    state => state.tasks
-  );
+  const { tasks, filter, sortBy, stats, status, error } = useSelector(state => state.tasks);
   const fullName = useSelector((state) => state.user.fullName);
   const email = useSelector((state) => state.user.email);
   const { theme } = useSelector(state => state.theme);
-  const [showForm, setShowForm] = useState(false);
-  const [editingTask, setEditingTask] = useState(null);
+  const [modalState, setModalState] = useState({ isOpen: false, task: null });
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
-
   const isDark = useColorScheme(theme);
+  const navigate = useNavigate();
 
-  const navigate = useNavigate()
+  // Handle modal close
+  const handleModalClose = () => {
+    setModalState({ isOpen: false, task: null });
+  };
 
+  // Format date for input (YYYY-MM-DD)
+  const formatDateForInput = (dateString) => {
+    if (!dateString) return '';
+    const [year, month, day] = dateString.split('-').map(Number);
+    const date = new Date(Date.UTC(year, month - 1, day));
+    return date.toISOString().split('T')[0];
+  };
+
+  // Handle adding task from calendar
+  const handleAddTaskFromCalendar = (dateString) => {
+    const formattedDate = formatDateForInput(dateString);
+    setModalState({ isOpen: true, task: { due_date: formattedDate } });
+  };
+
+  // Fetch tasks and stats
   useEffect(() => {
     const fetchTasks = async () => {
       dispatch(setLoading());
@@ -457,6 +474,7 @@ const TaskDashboard = () => {
     fetchStats();
   }, [dispatch]);
 
+  // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       dispatch(setCategoryLoading());
@@ -471,7 +489,7 @@ const TaskDashboard = () => {
     fetchCategories();
   }, [dispatch]);
 
-  // Close profile menu when clicking/tapping outside
+  // Handle clicks outside profile menu
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileMenuOpen && !event.target.closest('#profile-menu-container')) {
@@ -487,30 +505,31 @@ const TaskDashboard = () => {
     };
   }, [profileMenuOpen]);
 
+  // Filter and sort tasks
   const filteredTasks = useMemo(() => {
-    let filteredTasks = Array.isArray(tasks) ? [...tasks] : [];
+    let filtered = Array.isArray(tasks) ? [...tasks] : [];
 
     if (filter !== 'all') {
-      filteredTasks = filteredTasks.filter(task => {
+      filtered = filtered.filter(task => {
         if (filter === 'completed') return task.status === 'completed';
         if (filter === 'pending') return task.status === 'pending';
         if (filter === 'in-progress') return task.status === 'in-progress';
         if (filter === 'high-priority') return task.priority === 'high';
+        if (filter.startsWith('date-')) {
+          const dateStr = filter.substring(5);
+          return task.due_date === dateStr;
+        }
         return true;
       });
     }
 
-    filteredTasks.sort((a, b) => {
-      if (sortBy === 'dueDate') {
-        return new Date(a.due_date) - new Date(b.due_date);
-      }
+    filtered.sort((a, b) => {
+      if (sortBy === 'dueDate') return new Date(a.due_date) - new Date(b.due_date);
       if (sortBy === 'priority') {
         const priorityValues = { high: 3, medium: 2, low: 1 };
         return priorityValues[b.priority] - priorityValues[a.priority];
       }
-      if (sortBy === 'title') {
-        return a.title.localeCompare(b.title);
-      }
+      if (sortBy === 'title') return a.title.localeCompare(b.title);
       if (sortBy === 'status') {
         const statusValues = { pending: 1, 'in-progress': 2, completed: 3 };
         return statusValues[a.status] - statusValues[b.status];
@@ -518,12 +537,12 @@ const TaskDashboard = () => {
       return 0;
     });
 
-    return filteredTasks;
+    return filtered;
   }, [tasks, filter, sortBy]);
 
+  // Handlers
   const handleEditTask = (task) => {
-    setEditingTask(task);
-    setShowForm(false);
+    setModalState({ isOpen: true, task });
   };
 
   const handleDeleteTask = async (taskId) => {
@@ -531,7 +550,6 @@ const TaskDashboard = () => {
       try {
         await axiosInstance.delete(`/tasks/tasks/${taskId}/`);
         dispatch(deleteTask(taskId));
-        // Fetch updated stats after deletion
         const statsResponse = await axiosInstance.get('/tasks/tasks/stats/');
         dispatch(setStats(statsResponse.data));
       } catch (err) {
@@ -546,7 +564,6 @@ const TaskDashboard = () => {
       const newStatus = task.status === 'completed' ? 'pending' : 'completed';
       await axiosInstance.patch(`/tasks/tasks/${taskId}/`, { status: newStatus });
       dispatch(toggleTaskStatus(taskId));
-      // Fetch updated stats after status change
       const statsResponse = await axiosInstance.get('/tasks/tasks/stats/');
       dispatch(setStats(statsResponse.data));
     } catch (err) {
@@ -575,6 +592,7 @@ const TaskDashboard = () => {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
+  // Theme-based styles
   const bgColor = isDark ? 'bg-gray-900' : 'bg-gray-50';
   const textColor = isDark ? 'text-white' : 'text-gray-900';
   const secondaryBg = isDark ? 'bg-gray-800' : 'bg-white';
@@ -606,7 +624,7 @@ const TaskDashboard = () => {
                 <ChevronDown size={16} className={`ml-1 sm:ml-2 ${textColor} transition-transform ${profileMenuOpen ? 'rotate-180' : ''}`} />
               </button>
               {profileMenuOpen && (
-                <div 
+                <div
                   className={`absolute right-0 mt-2 w-52 sm:w-56 ${secondaryBg} ${borderColor} border rounded-lg shadow-xl py-1 z-50 max-h-[calc(100vh-100px)] overflow-y-auto`}
                   role="menu"
                   aria-orientation="vertical"
@@ -615,7 +633,7 @@ const TaskDashboard = () => {
                     <p className={`font-semibold ${textColor} text-base`}>{fullName}</p>
                     <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'} truncate`}>{email}</p>
                   </div>
-                  <a 
+                  <a
                     onClick={() => navigate('/profile')}
                     className={`flex items-center px-4 py-2 text-sm ${textColor} hover:${isDark ? 'bg-gray-700' : 'bg-gray-100'} transition-colors`}
                     role="menuitem"
@@ -623,8 +641,8 @@ const TaskDashboard = () => {
                     <User size={16} className="mr-3" />
                     Your Profile
                   </a>
-                  <a 
-                    href="#settings" 
+                  <a
+                    href="#settings"
                     className={`flex items-center px-4 py-2 text-sm ${textColor} hover:${isDark ? 'bg-gray-700' : 'bg-gray-100'} transition-colors`}
                     role="menuitem"
                   >
@@ -632,7 +650,7 @@ const TaskDashboard = () => {
                     Settings
                   </a>
                   <div className={`border-t ${borderColor} my-1`}></div>
-                  <button 
+                  <button
                     onClick={() => navigate('/logout')}
                     className={`flex items-center w-full text-left px-4 py-2 text-sm ${isDark ? 'text-red-400 hover:bg-gray-700' : 'text-red-600 hover:bg-gray-100'} transition-colors`}
                     role="menuitem"
@@ -702,10 +720,7 @@ const TaskDashboard = () => {
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
                 <h2 className={`text-xl sm:text-2xl font-bold ${textColor}`}>My Tasks</h2>
                 <button
-                  onClick={() => {
-                    setShowForm(true);
-                    setEditingTask(null);
-                  }}
+                  onClick={() => setModalState({ isOpen: true, task: null })}
                   className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-5 py-2.5 rounded-lg text-sm font-medium transition-colors shadow-md hover:shadow-lg w-full sm:w-auto justify-center"
                   aria-label="Add new task"
                 >
@@ -752,7 +767,6 @@ const TaskDashboard = () => {
                     High Priority
                   </button>
                 </div>
-
                 <div className="flex items-center justify-between sm:justify-end">
                   <label className={`text-sm mr-2 font-medium ${isDark ? 'text-gray-300' : 'text-gray-600'}`} htmlFor="sortBy">Sort by:</label>
                   <select
@@ -784,7 +798,7 @@ const TaskDashboard = () => {
                     {error}
                   </div>
                 ) : tasks.length === 0 ? (
-                  <EmptyState onAddClick={() => setShowForm(true)} isDark={isDark} />
+                  <EmptyState onAddClick={() => setModalState({ isOpen: true, task: null })} isDark={isDark} />
                 ) : filteredTasks.length > 0 ? (
                   filteredTasks.map(task => (
                     <TaskCard
@@ -800,8 +814,8 @@ const TaskDashboard = () => {
                   <div className={`py-10 text-center ${isDark ? 'text-gray-400' : 'text-gray-500'} bg-opacity-20 rounded-lg border ${borderColor}`}>
                     <Filter size={24} className="mx-auto mb-2" />
                     No tasks match your current filters
-                    <button 
-                      onClick={() => handleFilterChange('all')} 
+                    <button
+                      onClick={() => handleFilterChange('all')}
                       className={`mt-3 text-sm px-4 py-2 ${isDark ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'} rounded-lg transition-colors inline-block`}
                     >
                       Clear filters
@@ -814,14 +828,13 @@ const TaskDashboard = () => {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* New Task Form (Modal on Mobile) */}
-            {showForm && (
-              <TaskForm initialData={{}} onCancel={() => setShowForm(false)} isDark={isDark} />
-            )}
-
-            {/* Edit Task Form (Modal on Mobile) */}
-            {editingTask && (
-              <TaskForm initialData={editingTask} onCancel={() => setEditingTask(null)} isDark={isDark} />
+            {/* Task Form Modal */}
+            {modalState.isOpen && (
+              <TaskForm
+                initialData={modalState.task || {}}
+                onCancel={handleModalClose}
+                isDark={isDark}
+              />
             )}
 
             {/* High Priority Tasks */}
@@ -941,6 +954,20 @@ const TaskDashboard = () => {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Calendar Section */}
+        <div className="mt-6">
+          <div className={`${secondaryBg} ${borderColor} border rounded-lg shadow-md p-4 sm:p-6`}>
+            <h2 className={`text-lg sm:text-xl font-bold mb-4 ${textColor}`}>Task Calendar</h2>
+            <TaskCalendar
+              tasks={tasks}
+              onDateClick={(date) => handleFilterChange('date-' + date)}
+              onTaskClick={(task) => setModalState({ isOpen: true, task })}
+              onAddTask={handleAddTaskFromCalendar}
+              isDark={isDark}
+            />
           </div>
         </div>
       </div>
