@@ -189,7 +189,7 @@ CORS_ALLOW_CREDENTIALS = True
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/1',  # Local Redis server URL ,  # Redis server URL
+        'LOCATION': 'redis://127.0.0.1:6379/1',  # Local Redis server URL ,  # on deployment use redis instead of 127.0.0.1
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
         }
